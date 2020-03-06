@@ -250,7 +250,19 @@ Under the hood, this uses `InitCopy::Copier`, which also has an alias `InitCopy:
 
 ### With the Copyable Mixin
 
-**Warning**: If you use this mixin, your class and its children should **not** define `initialize_clone` &amp; `initialize_dup`, `clone` &amp; `dup`, `copy` &amp; `safe_copy`. The mixin defines these methods in order to set `@init_copy_method_name` to either `:clone` or `:dup` appropriately. This is faster than the above class way, but also comes with a little more risk because of this.
+The mixin is faster than the above class way; because instead of relying on searching &amp; parsing the `caller`, it sets `@init_copy_method_name` to either `:clone` or `:dup` appropriately in the following methods that it defines:
+
+- `initialize_clone`
+- `initialize_dup`
+- `dup`
+- `clone`
+
+Then in `initialize_copy`, use one of these methods that it also defines:
+
+- `copy`
+- `safe_copy`
+
+**Note**: If your class and/or its descendants redefine any of these methods, they must call `super`, else it will not work!
 
 ```Ruby
 require 'init_copy'
@@ -279,16 +291,18 @@ ng = og.dup
 
 ng.name << ' drools!'
 
-puts og.name
+puts og.name # "George"
 ```
 
-Set the default fallback:
+You can set the default fallback in your constructor:
 
 ```Ruby
 def initialize
   @init_copy_method_name = :clone
 end
 ```
+
+**Note**: `@init_copy_method_name` could be `nil` in `copy` if `super` was not called appropriately in a redefined method, and this will cause an error. `safe_copy` checks for this scenario and will default to `:dup` if `nil`. In general, it should be safe to not define a default value, assuming correct coding practices.
 
 `InitCopy::Copiable` is an alias to this class.
 
