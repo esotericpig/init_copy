@@ -254,8 +254,8 @@ The mixin is faster than the above class way; because instead of relying on sear
 
 - `initialize_clone`
 - `initialize_dup`
-- `dup`
 - `clone`
+- `dup`
 
 Then in your `initialize_copy`, use one of these methods that it also defines:
 
