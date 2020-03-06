@@ -145,8 +145,8 @@ class InitCopyTest < Minitest::Test
     assert_equal dog.name,dog.dup().name
     assert_equal dog.safe_name,dog.dup().safe_name
     
-    dog.dup().name << 'hax!'
-    dog.dup().safe_name << 'hax!'
+    dog.dup().name << 'hehe'
+    dog.dup().safe_name << 'hehe'
     
     assert_equal :dup,dog.copy_name
     assert_equal 'Lena',dog.name
