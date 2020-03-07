@@ -83,6 +83,12 @@ module InitCopy
   # @since  0.1.0
   ###
   module Copyable
+    # @since 0.1.1
+    def initialize(*)
+      super
+      @init_copy_method_name = DEFAULT_COPY_NAME
+    end
+    
     def initialize_clone(*)
       @init_copy_method_name = :clone
       super

@@ -32,6 +32,8 @@ end
 
 class Cat < Animal
   def initialize()
+    super
+    
     @name = 'Bunji'.dup()
     @safe_name = 'Chino'.dup()
   end
@@ -51,6 +53,8 @@ class Dog < Animal
   include InitCopy::Copyable
   
   def initialize()
+    super
+    
     @name = 'Lena'.dup()
     @safe_name = 'Trooper'.dup()
   end
@@ -61,6 +65,10 @@ class Dog < Animal
     @@copy_name = @init_copy_method_name
     @name = copy(@name)
     @safe_name = safe_copy(@safe_name)
+  end
+  
+  def init_copy_method_name()
+    return @init_copy_method_name
   end
 end
 
@@ -123,6 +131,7 @@ class InitCopyTest < Minitest::Test
   
   def test_copyable_basics()
     assert_equal InitCopy::Copyable,InitCopy::Copiable
+    assert_equal InitCopy::DEFAULT_COPY_NAME,Dog.new().init_copy_method_name()
   end
   
   def test_copyable_clone()
