@@ -15,6 +15,8 @@ class Bob
   attr_reader :name
   
   def initialize
+    super
+    
     @name = 'Bob'
   end
   
@@ -33,6 +35,8 @@ class Fred
   attr_reader :name
   
   def initialize
+    super
+    
     @name = 'Fred'
   end
   
@@ -118,7 +122,7 @@ Well, then along comes *George*. He's a pretty nice guy. He likes to do it this 
 def initialize_copy(orig)
   super(orig)
   
-  copy = caller[0].to_s.include?('clone') ? :clone : :dup
+  copy = caller[0].include?('clone') ? :clone : :dup
   
   @name = @name.__send__(copy)
   # More lines...
@@ -184,6 +188,8 @@ class George
   attr_reader :cool
   
   def initialize
+    super
+    
     @name = 'George'.dup
     @cool = true
   end
@@ -227,6 +233,8 @@ class George
   attr_reader :cool
   
   def initialize
+    super
+    
     @ic = InitCopy.new(:butterfly)
     
     @name = 'George'.dup
@@ -236,9 +244,9 @@ class George
   def initialize_copy(orig)
     super(orig)
     
-    puts "Copy method name: #{@ic.name}"
+    puts "Copy method name: #{@ic.name}" # :butterfly
     @ic.update_name()
-    puts "Copy method name: #{@ic.name}"
+    puts "Copy method name: #{@ic.name}" # :clone or :dup
     
     @name = @ic.copy(@name)
     @cool = @ic.copy(@cool)
@@ -274,6 +282,8 @@ class George
   attr_reader :cool
   
   def initialize
+    super
+    
     @name = 'George'.dup
     @cool = true
   end
@@ -298,6 +308,8 @@ You can set the default fallback in your constructor:
 
 ```Ruby
 def initialize
+  super
+  
   @init_copy_method_name = :clone
 end
 ```
