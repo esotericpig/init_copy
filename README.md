@@ -302,7 +302,7 @@ def initialize
 end
 ```
 
-**Note**: `@init_copy_method_name` could be `nil` in `copy` if `super` was not called appropriately in a redefined method, and this will cause an error. `safe_copy` checks for this scenario and will default to `:dup` if `nil`. In general, it should be safe to not define a default value, assuming correct coding practices.
+**Note**: `@init_copy_method_name` could be `nil` in `copy` if `super` was not called in your `initialize` method, and this will cause an error. `safe_copy` checks for this scenario and will default to `:dup` if `nil`. In general, it should be safe to not define a default value, assuming correct coding practices.
 
 `InitCopy::Copiable` is an alias to this class.
 
