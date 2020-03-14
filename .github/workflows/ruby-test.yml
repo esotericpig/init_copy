@@ -14,7 +14,7 @@ jobs:
     
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest,macos-latest,windows-latest]
         version: [2.4.x,2.5.x,2.6.x,2.7.x]
     
     steps:
