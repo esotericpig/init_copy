@@ -7,26 +7,30 @@ on:
     branches: [ master ]
 
 jobs:
-  run:
+  test:
+    name: Test on ${{ matrix.os }} w/ Ruby v${{ matrix.version }}
     
     runs-on: ${{ matrix.os }}
     
     strategy:
       matrix:
-        os: [ubuntu-latest,macos-latest,windows-latest]
-        version: [2.4,2.5,2.6,2.7]
+        os: [ubuntu-latest]
+        version: [2.4.x,2.5.x,2.6.x,2.7.x]
     
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: use-ruby ${{ matrix.version }}
+    
+    - name: Use Ruby ${{ matrix.version }}
       uses: ./
       with:
         ruby-version: ${{ matrix.version }}
     
-    - name: Rake Test
+    - name: Bundle Install
       run: |
         gem install bundler
         bundle install --jobs 4 --retry 3
+    
+    - name: Rake Test
+      run: |
         bundle exec rake test
