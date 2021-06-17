@@ -1,7 +1,6 @@
 # InitCopy
 
 [![Gem Version](https://badge.fury.io/rb/init_copy.svg)](https://badge.fury.io/rb/init_copy)
-[![Build Status](https://travis-ci.org/esotericpig/init_copy.svg?branch=master)](https://travis-ci.org/esotericpig/init_copy)
 
 [![Source Code](https://img.shields.io/badge/source-github-%23211F1F.svg)](https://github.com/esotericpig/init_copy)
 [![Changelog](https://img.shields.io/badge/changelog-md-%23A0522D.svg)](CHANGELOG.md)
@@ -14,16 +13,16 @@ On the one hand, there is *Bob*. He likes to define his `initialize_copy` using 
 ```Ruby
 class Bob
   attr_reader :name
-  
+
   def initialize
     super
-    
+
     @name = 'Bob'
   end
-  
+
   def initialize_copy(orig)
     super(orig)
-    
+
     @name = @name.clone # Use clone
   end
 end
@@ -34,16 +33,16 @@ On the other hand, there is *Fred*. He likes to use `dup`:
 ```Ruby
 class Fred
   attr_reader :name
-  
+
   def initialize
     super
-    
+
     @name = 'Fred'
   end
-  
+
   def initialize_copy(orig)
     super(orig)
-    
+
     @name = @name.dup # Use dup
   end
 end
@@ -102,14 +101,14 @@ So there are several solutions. The obvious one is to define `initialize_clone` 
 ```Ruby
 def initialize_clone(orig)
   super(orig)
-  
+
   @name = @name.clone
   # 100 more lines...
 end
 
 def initialize_dup(orig)
   super(orig)
-  
+
   @name = @name.dup
   # 100 more lines...
 end
@@ -122,9 +121,9 @@ Well, then along comes *George*. He's a pretty nice guy. He likes to do it this 
 ```Ruby
 def initialize_copy(orig)
   super(orig)
-  
+
   copy = caller[0].include?('clone') ? :clone : :dup
-  
+
   @name = @name.__send__(copy)
   # More lines...
 end
@@ -187,19 +186,19 @@ require 'init_copy'
 class George
   attr_reader :name
   attr_reader :cool
-  
+
   def initialize
     super
-    
+
     @name = 'George'.dup
     @cool = true
   end
-  
+
   def initialize_copy(orig)
     super(orig)
-    
+
     ic = InitCopy.new()
-    
+
     @name = ic.copy(@name)
     @cool = ic.copy(@cool)
   end
@@ -232,23 +231,23 @@ If you want to store the class in an instance variable for some reason (**not re
 class George
   attr_reader :name
   attr_reader :cool
-  
+
   def initialize
     super
-    
+
     @ic = InitCopy.new(:butterfly)
-    
+
     @name = 'George'.dup
     @cool = true
   end
-  
+
   def initialize_copy(orig)
     super(orig)
-    
+
     puts "Copy method name: #{@ic.name}" # :butterfly
     @ic.update_name()
     puts "Copy method name: #{@ic.name}" # :clone or :dup
-    
+
     @name = @ic.copy(@name)
     @cool = @ic.copy(@cool)
   end
@@ -278,20 +277,20 @@ require 'init_copy'
 
 class George
   include InitCopy::Copyable
-  
+
   attr_reader :name
   attr_reader :cool
-  
+
   def initialize
     super
-    
+
     @name = 'George'.dup
     @cool = true
   end
-  
+
   def initialize_copy(orig)
     super(orig)
-    
+
     @name = copy(@name)
     @cool = safe_copy(@cool)
   end
@@ -310,7 +309,7 @@ You can set the default fallback in your constructor:
 ```Ruby
 def initialize
   super
-  
+
   @init_copy_method_name = :clone
 end
 ```
@@ -344,7 +343,7 @@ $ bundle exec rake doc
 
 [MIT](LICENSE.txt)
 
-> Copyright (c) 2020 Jonathan Bradley Whited (@esotericpig)  
+> Copyright (c) 2020-2021 Jonathan Bradley Whited  
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy  
 > of this software and associated documentation files (the "Software"), to deal  

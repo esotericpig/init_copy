@@ -1,17 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-#--
-# This file is part of InitCopy.
-# Copyright (c) 2020 Jonathan Bradley Whited (@esotericpig)
-# 
-# InitCopy is free software: you can redistribute it and/or modify it under
-# the terms of the MIT License.
-# 
-# You should have received a copy of the MIT License along with InitCopy.
-# If not, see <https://choosealicense.com/licenses/mit/>.
-#++
-
 
 require 'bundler/gem_tasks'
 
@@ -41,10 +30,10 @@ end
 
 YARD::Rake::YardocTask.new() do |task|
   task.files = [File.join('lib','**','*.{rb}')]
-  
+
   task.options += ['--files','CHANGELOG.md,LICENSE.txt']
   task.options += ['--readme','README.md']
-  
+
   task.options << '--protected' # Show protected methods
   #task.options += ['--template-path',File.join('yard','templates')]
   task.options += ['--title',"InitCopy v#{InitCopy::VERSION} Doc"]
