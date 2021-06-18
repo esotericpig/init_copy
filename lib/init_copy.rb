@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # encoding: UTF-8
 # frozen_string_literal: true
 
@@ -17,7 +16,7 @@
 module InitCopy
   VERSION = '0.1.1'
 
-  DEFAULT_COPY_NAME=:dup
+  DEFAULT_COPY_NAME = :dup
 
   def self.new(default_name=DEFAULT_COPY_NAME)
     return Copier.new(default_name)
@@ -26,13 +25,13 @@ module InitCopy
   def self.find_copy_name(default_name=DEFAULT_COPY_NAME)
     copy_name = default_name
 
-    caller.each() do |name|
-      if name.end_with?(%q(clone'))
+    caller.each do |name|
+      if name.end_with?("clone'")
         copy_name = :clone
         break
       end
 
-      if name.end_with?(%q(dup'))
+      if name.end_with?("dup'")
         copy_name = :dup
         break
       end
@@ -54,7 +53,7 @@ module InitCopy
 
       @default_name = default_name
 
-      update_name()
+      update_name
     end
 
     def copy(var)
@@ -65,7 +64,7 @@ module InitCopy
       return var.respond_to?(@name) ? var.__send__(@name) : var
     end
 
-    def update_name()
+    def update_name
       @name = InitCopy.find_copy_name(@default_name)
     end
   end
@@ -112,7 +111,7 @@ module InitCopy
     end
 
     def safe_copy(var)
-      @init_copy_method_name = DEFAULT_COPY_NAME if @init_copy_method_name.nil?()
+      @init_copy_method_name = DEFAULT_COPY_NAME if @init_copy_method_name.nil?
 
       return var.respond_to?(@init_copy_method_name) ?
         var.__send__(@init_copy_method_name) : var

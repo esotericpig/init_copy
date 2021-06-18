@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # encoding: UTF-8
 # frozen_string_literal: true
 
@@ -21,23 +20,23 @@ class Animal
   attr_reader :name
   attr_reader :safe_name
 
-  def copy_name()
+  def copy_name
     return @@copy_name
   end
 end
 
 class Cat < Animal
-  def initialize()
+  def initialize
     super
 
-    @name = 'Bunji'.dup()
-    @safe_name = 'Chino'.dup()
+    @name = 'Bunji'.dup
+    @safe_name = 'Chino'.dup
   end
 
   def initialize_copy(orig)
     super(orig)
 
-    ic = InitCopy.new()
+    ic = InitCopy.new
 
     @@copy_name = ic.name
     @name = ic.copy(@name)
@@ -48,11 +47,11 @@ end
 class Dog < Animal
   include InitCopy::Copyable
 
-  def initialize()
+  def initialize
     super
 
-    @name = 'Lena'.dup()
-    @safe_name = 'Trooper'.dup()
+    @name = 'Lena'.dup
+    @safe_name = 'Trooper'.dup
   end
 
   def initialize_copy(orig)
@@ -63,28 +62,28 @@ class Dog < Animal
     @safe_name = safe_copy(@safe_name)
   end
 
-  def init_copy_method_name()
+  def init_copy_method_name
     return @init_copy_method_name
   end
 end
 
 class InitCopyTest < Minitest::Test
-  def setup()
+  def setup
   end
 
-  def test_top_module()
-    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy.new().name
+  def test_top_module
+    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy.new.name
     assert_equal :butterfly,InitCopy.new(:butterfly).name
     assert_equal :butterfly,InitCopy.find_copy_name(:butterfly)
   end
 
-  def test_copier_basics()
+  def test_copier_basics
     assert_equal InitCopy::Copier,InitCopy::Copyer
-    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy::Copier.new().name
+    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy::Copier.new.name
     assert_equal :butterfly,InitCopy::Copier.new(:butterfly).default_name
     assert_equal :butterfly,InitCopy::Copier.new(:butterfly).name
 
-    copier = InitCopy::Copier.new()
+    copier = InitCopy::Copier.new
 
     copier.default_name = :butterfly
     copier.name = :ladybug
@@ -92,66 +91,66 @@ class InitCopyTest < Minitest::Test
     assert_equal :butterfly,copier.default_name
     assert_equal :ladybug,copier.name
 
-    copier.update_name()
+    copier.update_name
 
     assert_equal :butterfly,copier.name
   end
 
-  def test_copier_clone()
-    cat = Cat.new()
+  def test_copier_clone
+    cat = Cat.new
 
-    assert_equal cat.name,cat.clone().name
-    assert_equal cat.safe_name,cat.clone().safe_name
+    assert_equal cat.name,cat.clone.name
+    assert_equal cat.safe_name,cat.clone.safe_name
 
-    cat.clone().name << 'hax!'
-    cat.clone().safe_name << 'hax!'
+    cat.clone.name << 'hax!'
+    cat.clone.safe_name << 'hax!'
 
     assert_equal :clone,cat.copy_name
     assert_equal 'Bunji',cat.name
     assert_equal 'Chino',cat.safe_name
   end
 
-  def test_copier_dup()
-    cat = Cat.new()
+  def test_copier_dup
+    cat = Cat.new
 
-    assert_equal cat.name,cat.dup().name
-    assert_equal cat.safe_name,cat.dup().safe_name
+    assert_equal cat.name,cat.dup.name
+    assert_equal cat.safe_name,cat.dup.safe_name
 
-    cat.dup().name << 'hehe'
-    cat.dup().safe_name << 'hehe'
+    cat.dup.name << 'hehe'
+    cat.dup.safe_name << 'hehe'
 
     assert_equal :dup,cat.copy_name
     assert_equal 'Bunji',cat.name
     assert_equal 'Chino',cat.safe_name
   end
 
-  def test_copyable_basics()
+  def test_copyable_basics
     assert_equal InitCopy::Copyable,InitCopy::Copiable
-    assert_equal InitCopy::DEFAULT_COPY_NAME,Dog.new().init_copy_method_name()
+    assert_equal InitCopy::DEFAULT_COPY_NAME,Dog.new.init_copy_method_name
   end
 
-  def test_copyable_clone()
-    dog = Dog.new()
+  def test_copyable_clone
+    dog = Dog.new
 
-    assert_equal dog.name,dog.clone().name
-    assert_equal dog.safe_name,dog.clone().safe_name
+    assert_equal dog.name,dog.clone.name
+    assert_equal dog.safe_name,dog.clone.safe_name
 
-    dog.clone().name << 'hax!'
-    dog.clone().safe_name << 'hax!'
+    dog.clone.name << 'hax!'
+    dog.clone.safe_name << 'hax!'
 
     assert_equal :clone,dog.copy_name
     assert_equal 'Lena',dog.name
     assert_equal 'Trooper',dog.safe_name
   end
 
-  def test_copyable_dup()
-    dog = Dog.new()
+  def test_copyable_dup
+    dog = Dog.new
 
-    assert_equal dog.name,dog.dup().name
-    assert_equal dog.safe_name,dog.dup().safe_name
+    assert_equal dog.name,dog.dup.name
+    assert_equal dog.safe_name,dog.dup.safe_name
 
-    dog.dup().name << 'hehe'
-    dog.dup().safe_name << 'hehe'
+    dog.dup.name << 'hehe'
+    dog.dup.safe_name << 'hehe'
 
     assert_equal :dup,dog.copy_name
     assert_equal 'Lena',dog.name

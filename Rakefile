@@ -17,10 +17,9 @@ CLOBBER.include('doc/')
 task default: [:test]
 
 desc 'Generate doc (YARDoc)'
-task :doc => [:yard] do |task|
-end
+task :doc,%i[] => %i[yard]
 
-Rake::TestTask.new() do |task|
+Rake::TestTask.new do |task|
   task.libs = ['lib','test']
   task.pattern = File.join('test','**','*_test.rb')
   task.description += ": '#{task.pattern}'"
@@ -28,7 +27,7 @@ Rake::TestTask.new() do |task|
   task.warning = true
 end
 
-YARD::Rake::YardocTask.new() do |task|
+YARD::Rake::YardocTask.new do |task|
   task.files = [File.join('lib','**','*.{rb}')]
 
   task.options += ['--files','CHANGELOG.md,LICENSE.txt']
