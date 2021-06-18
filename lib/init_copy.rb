@@ -14,7 +14,7 @@
 # @since  0.1.0
 ###
 module InitCopy
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
 
   DEFAULT_COPY_NAME = :dup
 
