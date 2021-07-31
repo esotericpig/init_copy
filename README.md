@@ -23,7 +23,7 @@ class Bob
   def initialize_copy(orig)
     super(orig)
 
-    @name = @name.clone # Use clone
+    @name = @name.clone # Use clone.
   end
 end
 ```
@@ -43,7 +43,7 @@ class Fred
   def initialize_copy(orig)
     super(orig)
 
-    @name = @name.dup # Use dup
+    @name = @name.dup # Use dup.
   end
 end
 ```
@@ -79,7 +79,7 @@ And here, Fred gets surprised:
 ```Ruby
 module FredExt
   def to_s
-    "Fred's password is 1234"
+    "Fred's password is 1234!"
   end
 end
 
@@ -96,7 +96,7 @@ puts bob.name.to_s  # What!? dup() should have removed FredExt!
 puts fred.name.to_s # OK!
 ```
 
-So there are several solutions. The obvious one is to define `initialize_clone` and `initialize_dup` and call the appropriate methods, but that means you have duplicate code doing basically the same thing! And leads to copy &amp; pasting as well as forgetting about one of the methods.
+So there are several solutions. The obvious one is to define `initialize_clone` and `initialize_dup` and call the appropriate methods, but that means you have duplicate code doing basically the same thing! And leads to copy & pasting as well as forgetting about one of the methods.
 
 ```Ruby
 def initialize_clone(orig)
@@ -146,28 +146,28 @@ See the [Using](#using) section for more info.
 
 Pick your poison...
 
+With the *RubyGems* CLI package manager:
+
+`$ gem install init_copy`
+
 In your *Gemspec* (*&lt;project&gt;.gemspec*):
 
 ```Ruby
 # Pick one...
-spec.add_runtime_dependency 'init_copy', '~> X.X.X'
-spec.add_development_dependency 'init_copy', '~> X.X.X'
+spec.add_runtime_dependency 'init_copy', '~> X.X'
+spec.add_development_dependency 'init_copy', '~> X.X'
 ```
 
 In your *Gemfile*:
 
 ```Ruby
 # Pick one...
-gem 'init_copy', '~> X.X.X'
-gem 'init_copy', '~> X.X.X', :group => :development
-gem 'init_copy', :git => 'https://github.com/esotericpig/init_copy.git', :tag => 'vX.X.X'
+gem 'init_copy', '~> X.X'
+gem 'init_copy', '~> X.X', group: :development
+gem 'init_copy', git: 'https://github.com/esotericpig/init_copy.git', tag: 'vX.X.X'
 ```
 
-With the RubyGems CLI package manager:
-
-`$ gem install init_copy`
-
-Manually:
+From source:
 
 ```
 $ git clone 'https://github.com/esotericpig/init_copy.git'
@@ -209,7 +209,7 @@ ng = og.dup
 
 ng.name << ' drools!'
 
-puts og.name # "George"
+puts og.name #=> "George"
 ```
 
 In the constructor, you can set the default fallback to `:clone` instead (in case the `caller` cannot be determined):
@@ -258,14 +258,14 @@ Under the hood, this uses `InitCopy::Copier`, which also has an alias `InitCopy:
 
 ### With the Copyable Mixin
 
-The mixin is faster than the above class way; because instead of relying on searching &amp; parsing the `caller`, it sets `@init_copy_method_name` to either `:clone` or `:dup` appropriately in the following methods that it defines:
+The mixin is faster than the above class way; because instead of relying on searching & parsing the `caller`, it sets `@init_copy_method_name` to either `:clone` or `:dup` appropriately in the following methods that it defines:
 
 - `initialize_clone`
 - `initialize_dup`
 - `clone`
 - `dup`
 
-Then in your `initialize_copy`, use one of these methods that it also defines:
+Then in your `initialize_copy`, use one of these *private* methods that it also defines:
 
 - `copy`
 - `safe_copy`
