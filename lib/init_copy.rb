@@ -69,7 +69,7 @@ module InitCopy
     end
   end
 
-  Copyer = Copier # Alias
+  Copyer = Copier # Alias.
 
   ###
   # The instance variable name is long and obnoxious to reduce conflicts.
@@ -114,9 +114,9 @@ module InitCopy
       @init_copy_method_name = DEFAULT_COPY_NAME if @init_copy_method_name.nil?
 
       return var.respond_to?(@init_copy_method_name) ?
-        var.__send__(@init_copy_method_name) : var
+             var.__send__(@init_copy_method_name) : var
     end
   end
 
-  Copiable = Copyable # Alias
+  Copiable = Copyable # Alias.
 end
