@@ -25,6 +25,7 @@ class Animal
   end
 end
 
+# For testing InitCopy.new() Copier.
 class Cat < Animal
   def initialize
     super
@@ -44,6 +45,7 @@ class Cat < Animal
   end
 end
 
+# For testing Copyable.
 class Dog < Animal
   include InitCopy::Copyable
 
@@ -67,6 +69,26 @@ class Dog < Animal
   end
 end
 
+# For testing clone() vs dup().
+class Catdog < Animal
+  def initialize
+    super
+
+    @name = 'Tiger'.dup
+    @safe_name = 'Angel'.dup
+  end
+
+  def initialize_copy(orig)
+    super(orig)
+
+    ic = InitCopy.new
+
+    @@copy_name = ic.name
+    @name = ic.copy(@name)
+    @safe_name = ic.safe_copy(@safe_name)
+  end
+end
+
 class InitCopyTest < Minitest::Test
   def setup
   end
@@ -80,6 +102,7 @@ class InitCopyTest < Minitest::Test
   def test_copier_basics
     assert_equal InitCopy::Copier,InitCopy::Copyer
     assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy::Copier.new.name
+
     assert_equal :butterfly,InitCopy::Copier.new(:butterfly).default_name
     assert_equal :butterfly,InitCopy::Copier.new(:butterfly).name
 
@@ -155,5 +178,45 @@ class InitCopyTest < Minitest::Test
     assert_equal :dup,dog.copy_name
     assert_equal 'Lena',dog.name
     assert_equal 'Trooper',dog.safe_name
+  end
+
+  def test_clone_vs_dup
+    catdog = Catdog.new
+
+    class << catdog.name
+      def give_treat
+        return 'big tuna'
+      end
+    end
+    class << catdog.safe_name
+      def give_treat
+        return 'hamburger'
+      end
+    end
+
+    assert_equal 'big tuna',catdog.name.give_treat
+    assert_equal 'hamburger',catdog.safe_name.give_treat
+
+    cloned = catdog.clone
+
+    assert_equal :clone,cloned.copy_name
+    assert_equal 'Tiger',cloned.name
+    assert_equal 'Angel',cloned.safe_name
+
+    duped = catdog.dup
+
+    assert_equal :dup,duped.copy_name
+    assert_equal 'Tiger',duped.name
+    assert_equal 'Angel',duped.safe_name
+
+    # clone() should preserve give_treat().
+    assert_respond_to cloned.name,:give_treat
+    assert_respond_to cloned.safe_name,:give_treat
+    assert_equal 'big tuna',cloned.name.give_treat
+    assert_equal 'hamburger',cloned.safe_name.give_treat
+
+    # dup() should NOT preserve give_treat().
+    refute_respond_to duped.name,:give_treat
+    refute_respond_to duped.safe_name,:give_treat
   end
 end
