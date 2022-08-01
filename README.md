@@ -1,7 +1,7 @@
 # InitCopy
 
 [![Gem Version](https://badge.fury.io/rb/init_copy.svg)](https://badge.fury.io/rb/init_copy)
-[![Tests](https://github.com/esotericpig/init_copy/actions/workflows/ruby_test.yml/badge.svg)](https://github.com/esotericpig/init_copy/actions/workflows/ruby_test.yml)
+[![Tests Status](https://github.com/esotericpig/init_copy/actions/workflows/ruby_test.yml/badge.svg)](https://github.com/esotericpig/init_copy/actions/workflows/ruby_test.yml)
 
 [![Source Code](https://img.shields.io/badge/source-github-%23211F1F.svg)](https://github.com/esotericpig/init_copy)
 [![Changelog](https://img.shields.io/badge/changelog-md-%23A0522D.svg)](CHANGELOG.md)
