@@ -2,9 +2,9 @@ name: ci
 
 on:
   push:
-    branches: [ 'master' ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ 'master' ]
+    branches: [ 'main' ]
 
 permissions:
   contents: read
@@ -13,20 +13,23 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ 'ubuntu-latest', 'macos-latest' ]
+        os: [ 'ubuntu-latest','macos-latest' ]
         # - https://www.ruby-lang.org/en/downloads/branches
-        ruby-version: [ '2.6', 'ruby-head', 'jruby-head' ]
+        ruby-version: [ '3.2','ruby-head','jruby-head' ]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ matrix.os }}"
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out repo
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     # - https://github.com/ruby/setup-ruby
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby-version }}
+        ruby-version: "${{ matrix.ruby-version }}"
         bundler-cache: true
 
     - name: Run tests

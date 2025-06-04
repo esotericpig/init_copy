@@ -1,14 +1,12 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-
 require_relative 'lib/init_copy'
-
 
 Gem::Specification.new do |spec|
   spec.name        = 'init_copy'
   spec.version     = InitCopy::VERSION
-  spec.authors     = ['Jonathan Bradley Whited']
+  spec.authors     = ['Bradley Whited']
   spec.email       = ['code@esotericpig.com']
   spec.licenses    = ['MIT']
   spec.homepage    = 'https://github.com/esotericpig/init_copy'
@@ -19,7 +17,7 @@ Gem::Specification.new do |spec|
     'homepage_uri'    => 'https://github.com/esotericpig/init_copy',
     'source_code_uri' => 'https://github.com/esotericpig/init_copy',
     'bug_tracker_uri' => 'https://github.com/esotericpig/init_copy/issues',
-    'changelog_uri'   => 'https://github.com/esotericpig/init_copy/blob/master/CHANGELOG.md',
+    'changelog_uri'   => 'https://github.com/esotericpig/init_copy/blob/main/CHANGELOG.md',
   }
 
   spec.require_paths = ['lib']
@@ -32,7 +30,7 @@ Gem::Specification.new do |spec|
 
   # Lowest version that isn't eol (end-of-life).
   # - https://www.ruby-lang.org/en/downloads/branches/
-  spec.required_ruby_version = '>= 2.4'
+  spec.required_ruby_version = '>= 3.2'
 
   spec.add_development_dependency 'bundler' ,'~> 2.2'
   spec.add_development_dependency 'minitest','~> 5.14'
