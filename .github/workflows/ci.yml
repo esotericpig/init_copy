@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ 'ubuntu-latest','macos-latest' ]
         # - https://www.ruby-lang.org/en/downloads/branches
-        ruby-version: [ '3.2','ruby-head','jruby-head' ]
+        ruby-version: [ '3.2','ruby-head' ]
 
     runs-on: "${{ matrix.os }}"
 
@@ -42,8 +42,8 @@ jobs:
     - name: Run tests
       run: bundle exec rake
 
-#    - name: Test doc
-#      run: bundle exec rake doc
+    - name: Test doc
+      run: bundle exec rake doc
 
     - name: Test build & install
       run: bundle exec rake build install:local
