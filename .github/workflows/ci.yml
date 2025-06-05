@@ -33,6 +33,9 @@ jobs:
         ruby-version: "${{ matrix.ruby-version }}"
         bundler-cache: true
 
+    - name: Install Gems
+      run: bundle install
+
     - name: Run tests
       run: bundle exec rake
 
