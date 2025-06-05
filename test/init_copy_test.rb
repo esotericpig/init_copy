@@ -3,220 +3,236 @@
 
 #--
 # This file is part of InitCopy.
-# Copyright (c) 2020-2021 Jonathan Bradley Whited
+# Copyright (c) 2020 Bradley Whited
 #
 # SPDX-License-Identifier: MIT
 #++
-
 
 require 'minitest/autorun'
 
 require 'init_copy'
 
+class InitCopyTest < Minitest::Test
+  # def setup
+  # end
 
-class Animal
-  @@copy_name = nil
+  def test_include
+    %i[include extend prepend].each do |method|
+      sut_class = Class.new
+      sut_class.__send__(method,InitCopy)
 
-  attr_reader :name
-  attr_reader :safe_name
+      assert_includes(sut_class.included_modules,InitCopy::Copyable,
+                      "`#{method}` of InitCopy should include InitCopy::Copyable")
+    end
+  end
 
-  def copy_name
-    return @@copy_name
+  def test_no_copy
+    sut = TestBag.new
+
+    refute_deep_copy(sut,sut.clone,:clone)
+    refute_deep_copy(sut,sut.dup,:dup)
+  end
+
+  def test_clone
+    sut = TestBagWithCopy.new
+
+    assert_deep_copy(sut,sut.clone,:clone)
+  end
+
+  def test_dup
+    sut = TestBagWithCopy.new
+
+    assert_deep_copy(sut,sut.dup,:dup)
+  end
+
+  def test_correct_clone_and_dup_extension_behavior
+    sut_ext = Module.new do
+      def bonus
+        return 100
+      end
+    end
+
+    sut = TestBagWithCopy.new
+    sut.extend(sut_ext)
+
+    sut_clone = sut.clone
+    sut_dup = sut.dup
+
+    assert_deep_copy(sut,sut_clone,:clone)
+    assert_deep_copy(sut,sut_dup,:dup)
+
+    assert_respond_to(sut,:bonus,'SUT should have the bonus extension')
+    assert_equal(100,sut.bonus)
+
+    assert_respond_to(sut_clone,:bonus,'clone should keep the bonus extension')
+    assert_equal(100,sut_clone.bonus)
+
+    refute_respond_to(sut_dup,:bonus,'dup should remove the bonus extension')
+    assert_raises(NoMethodError) { sut_dup.bonus }
+  end
+
+  def test_safe_copy
+    sut = TestBagWithSafeCopy.new
+
+    assert_respond_to(sut.nums,:clone)
+    assert_respond_to(sut.nums,:dup)
+
+    assert_deep_copy(sut,sut.clone,:clone)
+    assert_deep_copy(sut,sut.dup,:dup)
+
+    class << sut.nums
+      undef_method :clone
+      undef_method :dup
+    end
+
+    refute_respond_to(sut.nums,:clone)
+    refute_respond_to(sut.nums,:dup)
+
+    refute_deep_copy(sut,sut.clone,:clone,is_safe_copy: true)
+    refute_deep_copy(sut,sut.dup,:dup,is_safe_copy: true)
+
+    # Make sure we didn't remove clone()/dup() for all arrays.
+    assert_respond_to([1,2,3],:clone)
+    assert_respond_to([1,2,3],:dup)
+  end
+
+  def test_child_copy
+    sut_class = Class.new(TestBagWithCopy) do
+      attr_reader :strs
+
+      def initialize
+        super
+
+        @strs = %w[a b c]
+      end
+
+      def init_copy(*)
+        super
+
+        @strs = ic_copy(@strs)
+      end
+    end
+
+    sut = sut_class.new
+    sut_clone = sut.clone
+    sut_dup = sut.dup
+
+    assert_deep_copy(sut,sut_clone,:clone)
+    assert_deep_copy(sut,sut_dup,:dup)
+
+    expected = %w[a b c]
+
+    refute_same(sut.strs,sut_clone.strs)
+    refute_same(sut.strs,sut_dup.strs)
+    assert_equal(expected,sut.strs)
+    assert_equal(expected,sut_clone.strs)
+    assert_equal(expected,sut_dup.strs)
+
+    sut.strs << 'd'
+    sut_clone.strs << 'e'
+    sut_dup.strs << 'f'
+
+    assert_equal(%w[a b c d],sut.strs)
+    assert_equal(%w[a b c e],sut_clone.strs)
+    assert_equal(%w[a b c f],sut_dup.strs)
+  end
+
+  def assert_deep_copy(sut,sut_copy,copy_method_name)
+    refute_same(sut,sut_copy)
+
+    assert_nil(sut.init_copy_method_name)
+    assert_equal(copy_method_name,sut_copy.init_copy_method_name)
+
+    assert_nil(sut.orig)
+    assert_same(sut,sut_copy.orig)
+
+    expected = [1,2,3]
+
+    refute_same(sut.nums,sut_copy.nums)
+    assert_equal(expected,sut.nums)
+    assert_equal(expected,sut_copy.nums)
+
+    sut.nums << 4
+    sut_copy.nums << 5
+
+    assert_equal([1,2,3,4],sut.nums)
+    assert_equal([1,2,3,5],sut_copy.nums)
+
+    # Reset.
+    sut.nums.pop
+    sut_copy.nums.pop
+  end
+
+  def refute_deep_copy(sut,sut_copy,copy_method_name,is_safe_copy: false)
+    refute_same(sut,sut_copy)
+
+    assert_nil(sut.init_copy_method_name)
+    assert_equal(copy_method_name,sut_copy.init_copy_method_name)
+
+    assert_nil(sut.orig)
+
+    if is_safe_copy
+      assert_same(sut,sut_copy.orig)
+    else
+      assert_nil(sut_copy.orig)
+    end
+
+    expected = [1,2,3]
+
+    assert_same(sut.nums,sut_copy.nums)
+    assert_equal(expected,sut.nums)
+    assert_equal(expected,sut_copy.nums)
+
+    sut.nums << 4
+    sut_copy.nums << 5
+
+    expected = [1,2,3,4,5]
+
+    assert_equal(expected,sut.nums)
+    assert_equal(expected,sut_copy.nums)
+
+    # Reset.
+    sut.nums.pop(2)
   end
 end
 
-# For testing InitCopy.new() Copier.
-class Cat < Animal
-  def initialize
-    super
+class TestBag
+  include InitCopy
 
-    @name = 'Bunji'.dup
-    @safe_name = 'Chino'.dup
-  end
-
-  def initialize_copy(orig)
-    super(orig)
-
-    ic = InitCopy.new
-
-    @@copy_name = ic.name
-    @name = ic.copy(@name)
-    @safe_name = ic.safe_copy(@safe_name)
-  end
-end
-
-# For testing Copyable.
-class Dog < Animal
-  include InitCopy::Copyable
+  attr_reader :orig
+  attr_reader :nums
 
   def initialize
     super
 
-    @name = 'Lena'.dup
-    @safe_name = 'Trooper'.dup
-  end
-
-  def initialize_copy(orig)
-    super(orig)
-
-    @@copy_name = @init_copy_method_name
-    @name = copy(@name)
-    @safe_name = safe_copy(@safe_name)
+    @__init_copy_method_name = nil
+    @orig = nil
+    @nums = [1,2,3]
   end
 
   def init_copy_method_name
-    return @init_copy_method_name
+    return @__init_copy_method_name
   end
 end
 
-# For testing clone() vs dup().
-class Catdog < Animal
-  def initialize
+class TestBagWithCopy < TestBag
+  protected
+
+  def init_copy(orig)
     super
 
-    @name = 'Tiger'.dup
-    @safe_name = 'Angel'.dup
-  end
-
-  def initialize_copy(orig)
-    super(orig)
-
-    ic = InitCopy.new
-
-    @@copy_name = ic.name
-    @name = ic.copy(@name)
-    @safe_name = ic.safe_copy(@safe_name)
+    @orig = orig
+    @nums = ic_copy(@nums)
   end
 end
 
-class InitCopyTest < Minitest::Test
-  def setup
-  end
+class TestBagWithSafeCopy < TestBag
+  protected
 
-  def test_top_module
-    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy.new.name
-    assert_equal :butterfly,InitCopy.new(:butterfly).name
-    assert_equal :butterfly,InitCopy.find_copy_name(:butterfly)
-  end
+  def init_copy(orig)
+    super
 
-  def test_copier_basics
-    assert_equal InitCopy::Copier,InitCopy::Copyer
-    assert_equal InitCopy::DEFAULT_COPY_NAME,InitCopy::Copier.new.name
-
-    assert_equal :butterfly,InitCopy::Copier.new(:butterfly).default_name
-    assert_equal :butterfly,InitCopy::Copier.new(:butterfly).name
-
-    copier = InitCopy::Copier.new
-
-    copier.default_name = :butterfly
-    copier.name = :ladybug
-
-    assert_equal :butterfly,copier.default_name
-    assert_equal :ladybug,copier.name
-
-    copier.update_name
-
-    assert_equal :butterfly,copier.name
-  end
-
-  def test_copier_clone
-    cat = Cat.new
-
-    assert_equal cat.name,cat.clone.name
-    assert_equal cat.safe_name,cat.clone.safe_name
-
-    cat.clone.name << 'hax!'
-    cat.clone.safe_name << 'hax!'
-
-    assert_equal :clone,cat.copy_name
-    assert_equal 'Bunji',cat.name
-    assert_equal 'Chino',cat.safe_name
-  end
-
-  def test_copier_dup
-    cat = Cat.new
-
-    assert_equal cat.name,cat.dup.name
-    assert_equal cat.safe_name,cat.dup.safe_name
-
-    cat.dup.name << 'hehe'
-    cat.dup.safe_name << 'hehe'
-
-    assert_equal :dup,cat.copy_name
-    assert_equal 'Bunji',cat.name
-    assert_equal 'Chino',cat.safe_name
-  end
-
-  def test_copyable_basics
-    assert_equal InitCopy::Copyable,InitCopy::Copiable
-    assert_equal InitCopy::DEFAULT_COPY_NAME,Dog.new.init_copy_method_name
-  end
-
-  def test_copyable_clone
-    dog = Dog.new
-
-    assert_equal dog.name,dog.clone.name
-    assert_equal dog.safe_name,dog.clone.safe_name
-
-    dog.clone.name << 'hax!'
-    dog.clone.safe_name << 'hax!'
-
-    assert_equal :clone,dog.copy_name
-    assert_equal 'Lena',dog.name
-    assert_equal 'Trooper',dog.safe_name
-  end
-
-  def test_copyable_dup
-    dog = Dog.new
-
-    assert_equal dog.name,dog.dup.name
-    assert_equal dog.safe_name,dog.dup.safe_name
-
-    dog.dup.name << 'hehe'
-    dog.dup.safe_name << 'hehe'
-
-    assert_equal :dup,dog.copy_name
-    assert_equal 'Lena',dog.name
-    assert_equal 'Trooper',dog.safe_name
-  end
-
-  def test_clone_vs_dup
-    catdog = Catdog.new
-
-    class << catdog.name
-      def give_treat
-        return 'big tuna'
-      end
-    end
-    class << catdog.safe_name
-      def give_treat
-        return 'hamburger'
-      end
-    end
-
-    assert_equal 'big tuna',catdog.name.give_treat
-    assert_equal 'hamburger',catdog.safe_name.give_treat
-
-    cloned = catdog.clone
-
-    assert_equal :clone,cloned.copy_name
-    assert_equal 'Tiger',cloned.name
-    assert_equal 'Angel',cloned.safe_name
-
-    duped = catdog.dup
-
-    assert_equal :dup,duped.copy_name
-    assert_equal 'Tiger',duped.name
-    assert_equal 'Angel',duped.safe_name
-
-    # clone() should preserve give_treat().
-    assert_respond_to cloned.name,:give_treat
-    assert_respond_to cloned.safe_name,:give_treat
-    assert_equal 'big tuna',cloned.name.give_treat
-    assert_equal 'hamburger',cloned.safe_name.give_treat
-
-    # dup() should NOT preserve give_treat().
-    refute_respond_to duped.name,:give_treat
-    refute_respond_to duped.safe_name,:give_treat
+    @orig = orig
+    @nums = ic_copy?(@nums)
   end
 end

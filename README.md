@@ -344,7 +344,7 @@ $ bundle exec rake doc
 
 [MIT](LICENSE.txt)
 
-> Copyright (c) 2020-2022 Jonathan Bradley Whited  
+> Copyright (c) 2020-2025 Bradley Whited  
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy  
 > of this software and associated documentation files (the "Software"), to deal  

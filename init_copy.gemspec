@@ -14,26 +14,32 @@ Gem::Specification.new do |spec|
   spec.description = spec.summary
 
   spec.metadata = {
-    'homepage_uri'    => 'https://github.com/esotericpig/init_copy',
-    'source_code_uri' => 'https://github.com/esotericpig/init_copy',
-    'bug_tracker_uri' => 'https://github.com/esotericpig/init_copy/issues',
-    'changelog_uri'   => 'https://github.com/esotericpig/init_copy/blob/main/CHANGELOG.md',
+    'rubygems_mfa_required' => 'true',
+    'homepage_uri'          => 'https://github.com/esotericpig/init_copy',
+    'source_code_uri'       => 'https://github.com/esotericpig/init_copy',
+    'bug_tracker_uri'       => 'https://github.com/esotericpig/init_copy/issues',
+    'changelog_uri'         => 'https://github.com/esotericpig/init_copy/blob/main/CHANGELOG.md',
   }
-
-  spec.require_paths = ['lib']
-
-  spec.files = [
-    Dir.glob(File.join("{#{spec.require_paths.join(',')}}",'**','*.{rb}')),
-    %W[ Gemfile #{spec.name}.gemspec Rakefile ],
-    %w[ LICENSE.txt ],
-  ].flatten
 
   # Lowest version that isn't eol (end-of-life).
   # - https://www.ruby-lang.org/en/downloads/branches/
   spec.required_ruby_version = '>= 3.2'
+  spec.require_paths         = ['lib']
+  spec.bindir                = 'bin'
+  spec.executables           = []
 
-  spec.add_development_dependency 'bundler' ,'~> 2.2'
-  spec.add_development_dependency 'minitest','~> 5.14'
-  spec.add_development_dependency 'rake'    ,'~> 13.0'
-  spec.add_development_dependency 'yard'    ,'~> 0.9'  # Doc.
+  spec.extra_rdoc_files = %w[LICENSE.txt README.md]
+  spec.rdoc_options     = [
+    %w[--embed-mixins --hyperlink-all --line-numbers --show-hash],
+    '--main','README.md',
+    '--title',"InitCopy v#{InitCopy::VERSION}",
+  ].flatten
+
+  spec.files = [
+    Dir.glob("{#{spec.require_paths.join(',')}}/**/*.{erb,rb}"),
+    Dir.glob("#{spec.bindir}/*"),
+    Dir.glob('{spec,test}/**/*.{erb,rb}'),
+    %W[Gemfile #{spec.name}.gemspec Rakefile .rdoc_options],
+    spec.extra_rdoc_files,
+  ].flatten
 end

@@ -1,0 +1,23 @@
+---
+op_dir: doc
+title: InitCopy
+main_page: README.md
+
+apply_default_exclude: true
+embed_mixins: true
+force_update: true
+hyperlink_all: true
+line_numbers: true
+show_hash: true
+skip_tests: true
+
+exclude:
+- /.git/
+- /.github/
+- /.idea/
+- /doc/
+- /pkg/
+- /spec/
+- /stock/
+- /test/
+- Gemfile.lock

@@ -34,3 +34,9 @@ jobs:
 
     - name: Run tests
       run: bundle exec rake
+
+    - name: Test doc
+      run: bundle exec rake doc
+
+    - name: Test build & install
+      run: bundle exec rake build install:local
