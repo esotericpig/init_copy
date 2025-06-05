@@ -23,4 +23,6 @@ exclude:
 - /spec/
 - /stock/
 - /test/
+- Gemfile
 - Gemfile.lock
+- Rakefile

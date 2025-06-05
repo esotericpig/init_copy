@@ -23,4 +23,5 @@ end
 
 RDoc::Task.new(:doc) do |task|
   task.rdoc_dir = 'doc'
+  task.title = "InitCopy v#{InitCopy::VERSION}"
 end

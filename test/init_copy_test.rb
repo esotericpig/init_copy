@@ -45,7 +45,7 @@ class InitCopyTest < Minitest::Test
     assert_deep_copy(sut,sut.dup,:dup)
   end
 
-  def test_correct_clone_and_dup_extension_behavior
+  def test_correct_clone_and_dup_behavior
     sut_ext = Module.new do
       def bonus
         return 100
@@ -55,18 +55,22 @@ class InitCopyTest < Minitest::Test
     sut = TestBagWithCopy.new
     sut.extend(sut_ext)
 
+    assert_deep_copy(sut,sut.clone,:clone)
+    assert_deep_copy(sut,sut.dup,:dup)
+
+    sut.nums.freeze
     sut_clone = sut.clone
     sut_dup = sut.dup
 
-    assert_deep_copy(sut,sut_clone,:clone)
-    assert_deep_copy(sut,sut_dup,:dup)
-
+    assert_predicate(sut.nums,:frozen?,'SUT nums should be frozen')
     assert_respond_to(sut,:bonus,'SUT should have the bonus extension')
     assert_equal(100,sut.bonus)
 
+    assert_predicate(sut_clone.nums,:frozen?,'clone should keep the nums as frozen')
     assert_respond_to(sut_clone,:bonus,'clone should keep the bonus extension')
     assert_equal(100,sut_clone.bonus)
 
+    refute_predicate(sut_dup.nums,:frozen?,'dup should remove the internal frozen state of nums')
     refute_respond_to(sut_dup,:bonus,'dup should remove the bonus extension')
     assert_raises(NoMethodError) { sut_dup.bonus }
   end

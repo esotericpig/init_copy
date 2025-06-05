@@ -8,6 +8,21 @@
 # SPDX-License-Identifier: MIT
 #++
 
+# Example usage:
+#   require 'init_copy'
+#
+#   class JangoFett
+#     include InitCopy
+#
+#     protected
+#
+#     def init_copy(_orig)
+#       super
+#
+#       @gear = ic_copy(@gear)
+#       @order66 = ic_copy?(@order66) # Safe copy if no dup/clone.
+#     end
+#   end
 module InitCopy
   VERSION = '0.2.0'
 

@@ -46,4 +46,7 @@ jobs:
       run: bundle exec rake doc
 
     - name: Test build & install
-      run: bundle exec rake build install:local
+      run: |
+        bundle exec rake build
+        gem install --document --local pkg/*.gem
+        ruby -w -rinit_copy -e 'puts InitCopy::VERSION'
