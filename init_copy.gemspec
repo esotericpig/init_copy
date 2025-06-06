@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email       = ['code@esotericpig.com']
   spec.licenses    = ['MIT']
   spec.homepage    = 'https://github.com/esotericpig/init_copy'
-  spec.summary     = 'Easily use the appropriate clone/dup method in initialize_copy.'
+  spec.summary     = 'Easily use the correct clone or dup method in initialize_copy.'
   spec.description = spec.summary
 
   spec.metadata = {
