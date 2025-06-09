@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   }
 
   # - https://www.ruby-lang.org/en/downloads/branches/
-  spec.required_ruby_version = '>= 3.0'
+  spec.required_ruby_version = '>= 3.1'
   spec.require_paths         = ['lib']
   spec.bindir                = 'bin'
   spec.executables           = []
