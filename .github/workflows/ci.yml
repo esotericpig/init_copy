@@ -13,7 +13,13 @@ jobs:
       matrix:
         os: [ 'ubuntu-latest','macos-latest' ]
         # - https://www.ruby-lang.org/en/downloads/branches
-        ruby-version: [ '2.4','3.2','ruby-head' ]
+        ruby: [ '2.4','3.2','ruby-head' ]
+
+        # CRuby < 2.6 doesn't support macos-arm64, so test on amd64 instead.
+        include:
+        - { os: 'macos-13',ruby: '2.4' }
+        exclude:
+        - { os: 'macos-latest',ruby: '2.4' }
 
     runs-on: "${{ matrix.os }}"
 
@@ -27,7 +33,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "${{ matrix.ruby-version }}"
+        ruby-version: "${{ matrix.ruby }}"
         bundler-cache: false
         cache-version: 2
 
