@@ -5,6 +5,15 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-06-09
+### Changed
+- Major change (again) to remove including `InitCopy`.
+  - Instead, include `InitCopy::Able` (was named `InitCopy::Copyable`).
+  - This change was made because `include InitCopy` added the `VERSION` const to classes, and it also added two modules to your hierarchy instead of just one: `InitCopy` and `InitCopy::Copyable`. Due to this, I decided only `InitCopy::Able` is better, even though `include InitCopy` was nicer looking and easier to remember.
+- Converted Minitest unit tests to spec-style tests.
+- Reverted min required Ruby version from `3.0` back to `2.4` because the Gem is quite simple and can be used safely with legacy code.
+  - Also added CI test for v2.4.
+
 ## [0.2.0] - 2025-06-05
 ### Changed
 - Major change to simplify usage.
