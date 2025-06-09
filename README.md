@@ -50,12 +50,13 @@ require 'init_copy'
 class JangoFett
   include InitCopy::Able
 
-  attr_reader :gear,:order66
+  attr_reader :gear,:bounties,:order66
 
   def initialize
     super
 
     @gear = ['blaster','jetpack']
+    @bounties = ['Padmé','Vosa']
 
     @order66 = Class.new do
       undef_method :clone
@@ -69,13 +70,15 @@ class JangoFett
     super
 
     @gear = ic_copy(@gear)
+    @bounties = ic_copy(@bounties)
+
     @order66 = ic_copy?(@order66) # Safe copy if no dup/clone.
   end
 end
 
 # Init vars.
 jango = JangoFett.new
-jango.freeze
+jango.bounties.freeze
 
 boba1 = jango.clone
 boba2 = jango.dup
@@ -84,13 +87,16 @@ jango.gear << 'vibroblade'
 boba1.gear << 'implant'
 
 # Check vars.
-puts jango.gear.inspect #=> ["blaster", "jetpack", "vibroblade"]
+puts jango.gear.inspect     #=> ["blaster", "jetpack", "vibroblade"]
 
-puts boba1.gear.inspect #=> ["blaster", "jetpack", "implant"]
-puts boba2.gear.inspect #=> ["blaster", "jetpack"]
+puts boba1.gear.inspect     #=> ["blaster", "jetpack", "implant"]
+puts boba2.gear.inspect     #=> ["blaster", "jetpack"]
 
-puts boba1.frozen? #=> true  (clone)
-puts boba2.frozen? #=> false (dup)
+puts boba1.bounties.inspect #=> ["Padmé", "Vosa"]
+puts boba2.bounties.inspect #=> ["Padmé", "Vosa"]
+
+puts boba1.bounties.frozen? #=> true  (clone)
+puts boba2.bounties.frozen? #=> false (dup)
 ```
 
 ## // Contents
