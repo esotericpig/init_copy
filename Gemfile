@@ -6,7 +6,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development,:test do
-  gem 'bundler' ,'~>  2.3 '
+  gem 'bundler' ,'~>  2.6 '
   gem 'rake'    ,'~> 13.3 '
   gem 'rdoc'    ,'~>  6.14'
 end

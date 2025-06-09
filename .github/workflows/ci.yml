@@ -13,13 +13,7 @@ jobs:
       matrix:
         os: [ 'ubuntu-latest','macos-latest' ]
         # - https://www.ruby-lang.org/en/downloads/branches
-        ruby: [ '2.4','3.2','ruby-head' ]
-
-        # CRuby < 2.6 doesn't support macos-arm64, so test on amd64 instead.
-        include:
-        - { os: 'macos-13',ruby: '2.4' }
-        exclude:
-        - { os: 'macos-latest',ruby: '2.4' }
+        ruby: [ '3.0','ruby-head' ]
 
     runs-on: "${{ matrix.os }}"
 
