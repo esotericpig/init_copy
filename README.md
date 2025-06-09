@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/init_copy.svg)](https://badge.fury.io/rb/init_copy)
 [![CI Status](https://github.com/esotericpig/init_copy/actions/workflows/ci.yml/badge.svg)](https://github.com/esotericpig/init_copy/actions/workflows/ci.yml)
-
 [![Source Code](https://img.shields.io/badge/source-github-%23211F1F.svg)](https://github.com/esotericpig/init_copy)
 [![Changelog](https://img.shields.io/badge/changelog-md-%23A0522D.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/github/license/esotericpig/init_copy.svg)](LICENSE.txt)
@@ -18,6 +17,7 @@ module SecretExt
   end
 end
 
+# Init vars.
 bob = 'Bob'
 bob.extend(SecretExt)
 bob.freeze
@@ -25,6 +25,7 @@ bob.freeze
 clone = bob.clone
 dup   = bob.dup
 
+# Check vars.
 puts clone.frozen? #=> true
 puts dup.frozen?   #=> false
 
@@ -35,8 +36,9 @@ puts dup.secret    #=> NoMethodError
 To solve this issue in the past, we had to define both `initialize_clone` & `initialize_dup` and maintain two copies of all our deep-copy code. That sucks. 😞
 
 🚀 Instead, *InitCopy* was created:
-1. Install the gem `init_copy` ([RubyGems.org page](https://rubygems.org/gems/init_copy)).
-2. Include `InitCopy` in your class/module.
+
+1. Install the gem `init_copy` ([on RubyGems.org](https://rubygems.org/gems/init_copy)).
+2. Include `InitCopy::Able` in your class/module.
 3. Override the `init_copy(original)` method.
 4. Use `ic_copy(var)`, instead of clone/dup.
 
@@ -46,7 +48,7 @@ Example usage:
 require 'init_copy'
 
 class JangoFett
-  include InitCopy
+  include InitCopy::Able
 
   attr_reader :gear,:order66
 
@@ -71,6 +73,7 @@ class JangoFett
   end
 end
 
+# Init vars.
 jango = JangoFett.new
 jango.freeze
 
@@ -80,6 +83,7 @@ boba2 = jango.dup
 jango.gear << 'vibroblade'
 boba1.gear << 'implant'
 
+# Check vars.
 puts jango.gear.inspect #=> ["blaster", "jetpack", "vibroblade"]
 
 puts boba1.gear.inspect #=> ["blaster", "jetpack", "implant"]
@@ -114,16 +118,15 @@ spec.add_dependency 'init_copy', '~> X.X'
 In your *Gemfile*:
 
 ```ruby
-# Pick one...
+# Pick your poison...
 gem 'init_copy', '~> X.X'
-
 gem 'init_copy', git: 'https://github.com/esotericpig/init_copy.git', branch: 'main'
 ```
 
 From source:
 
 ```bash
-git clone 'https://github.com/esotericpig/init_copy.git'
+git clone --depth 1 'https://github.com/esotericpig/init_copy.git'
 cd init_copy
 bundle install
 bundle exec rake install:local

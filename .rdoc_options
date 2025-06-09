@@ -11,6 +11,7 @@ embed_mixins: true
 force_update: true
 hyperlink_all: true
 line_numbers: true
+markup: markdown
 show_hash: true
 skip_tests: true
 

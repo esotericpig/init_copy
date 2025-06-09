@@ -12,196 +12,180 @@ require 'minitest/autorun'
 
 require 'init_copy'
 
-class InitCopyTest < Minitest::Test
-  # def setup
-  # end
+describe InitCopy do
+  it 'has a correct version' do
+    _(InitCopy::VERSION).must_match(/\d+\.\d+\.\d+(-[0-9A-Za-z\-.]+)?(\+[0-9A-Za-z\-.]+)?/)
+  end
 
-  def test_include
-    %i[include extend prepend].each do |method|
-      sut_class = Class.new
-      sut_class.__send__(method,InitCopy)
+  def self.add_basic_copy_tests
+    it 'is not the same as the copies' do
+      _(@sut).wont_be_same_as(@sut_clone)
+      _(@sut).wont_be_same_as(@sut_dup)
+    end
 
-      assert_includes(sut_class.included_modules,InitCopy::Copyable,
-                      "`#{method}` of InitCopy should include InitCopy::Copyable")
+    it 'has the correct copy method name' do
+      _(@sut.init_copy_method_name).must_be_nil
+      _(@sut_clone.init_copy_method_name).must_equal(:clone)
+      _(@sut_dup.init_copy_method_name).must_equal(:dup)
     end
   end
 
-  def test_no_copy
-    sut = TestBag.new
+  def self.add_deep_copy_tests(is_frozen: false)
+    it 'has the correct original' do
+      _(@sut.orig).must_be_nil
+      _(@sut_clone.orig).must_be_same_as(@sut)
+      _(@sut_dup.orig).must_be_same_as(@sut)
+    end
 
-    refute_deep_copy(sut,sut.clone,:clone)
-    refute_deep_copy(sut,sut.dup,:dup)
-  end
+    it 'does a deep copy' do
+      _(@sut.nums).wont_be_same_as(@sut_clone.nums)
+      _(@sut.nums).wont_be_same_as(@sut_dup.nums)
 
-  def test_clone
-    sut = TestBagWithCopy.new
+      expected = [1,2,3]
 
-    assert_deep_copy(sut,sut.clone,:clone)
-  end
+      _(@sut.nums).must_equal(expected)
+      _(@sut_clone.nums).must_equal(expected)
+      _(@sut_dup.nums).must_equal(expected)
 
-  def test_dup
-    sut = TestBagWithCopy.new
+      if !is_frozen
+        @sut.nums << 4
+        @sut_clone.nums << 5
+        @sut_dup.nums << 6
 
-    assert_deep_copy(sut,sut.dup,:dup)
-  end
-
-  def test_correct_clone_and_dup_behavior
-    sut_ext = Module.new do
-      def bonus
-        return 100
+        _(@sut.nums).must_equal([1,2,3,4])
+        _(@sut_clone.nums).must_equal([1,2,3,5])
+        _(@sut_dup.nums).must_equal([1,2,3,6])
       end
     end
-
-    sut = TestBagWithCopy.new
-    sut.extend(sut_ext)
-
-    assert_deep_copy(sut,sut.clone,:clone)
-    assert_deep_copy(sut,sut.dup,:dup)
-
-    sut.nums.freeze
-    sut_clone = sut.clone
-    sut_dup = sut.dup
-
-    assert_predicate(sut.nums,:frozen?,'SUT nums should be frozen')
-    assert_respond_to(sut,:bonus,'SUT should have the bonus extension')
-    assert_equal(100,sut.bonus)
-
-    assert_predicate(sut_clone.nums,:frozen?,'clone should keep the nums as frozen')
-    assert_respond_to(sut_clone,:bonus,'clone should keep the bonus extension')
-    assert_equal(100,sut_clone.bonus)
-
-    refute_predicate(sut_dup.nums,:frozen?,'dup should remove the internal frozen state of nums')
-    refute_respond_to(sut_dup,:bonus,'dup should remove the bonus extension')
-    assert_raises(NoMethodError) { sut_dup.bonus }
   end
 
-  def test_safe_copy
-    sut = TestBagWithSafeCopy.new
-
-    assert_respond_to(sut.nums,:clone)
-    assert_respond_to(sut.nums,:dup)
-
-    assert_deep_copy(sut,sut.clone,:clone)
-    assert_deep_copy(sut,sut.dup,:dup)
-
-    class << sut.nums
-      undef_method :clone
-      undef_method :dup
+  describe 'without copy' do
+    before do
+      @sut = TestBag.new
+      @sut_clone = @sut.clone
+      @sut_dup = @sut.dup
     end
 
-    refute_respond_to(sut.nums,:clone)
-    refute_respond_to(sut.nums,:dup)
+    add_basic_copy_tests
 
-    refute_deep_copy(sut,sut.clone,:clone,is_safe_copy: true)
-    refute_deep_copy(sut,sut.dup,:dup,is_safe_copy: true)
-
-    # Make sure we didn't remove clone()/dup() for all arrays.
-    assert_respond_to([1,2,3],:clone)
-    assert_respond_to([1,2,3],:dup)
-  end
-
-  def test_child_copy
-    sut_class = Class.new(TestBagWithCopy) do
-      attr_reader :strs
-
-      def initialize
-        super
-
-        @strs = %w[a b c]
-      end
-
-      def init_copy(*)
-        super
-
-        @strs = ic_copy(@strs)
-      end
+    it 'has no original' do
+      _(@sut.orig).must_be_nil
+      _(@sut_clone.orig).must_be_nil
+      _(@sut_dup.orig).must_be_nil
     end
 
-    sut = sut_class.new
-    sut_clone = sut.clone
-    sut_dup = sut.dup
+    it 'does not do a deep copy' do
+      _(@sut.nums).must_be_same_as(@sut_clone.nums)
+      _(@sut.nums).must_be_same_as(@sut_dup.nums)
 
-    assert_deep_copy(sut,sut_clone,:clone)
-    assert_deep_copy(sut,sut_dup,:dup)
+      expected = [1,2,3]
 
-    expected = %w[a b c]
+      _(@sut.nums).must_equal(expected)
+      _(@sut_clone.nums).must_equal(expected)
+      _(@sut_dup.nums).must_equal(expected)
 
-    refute_same(sut.strs,sut_clone.strs)
-    refute_same(sut.strs,sut_dup.strs)
-    assert_equal(expected,sut.strs)
-    assert_equal(expected,sut_clone.strs)
-    assert_equal(expected,sut_dup.strs)
+      @sut.nums << 4
+      @sut_clone.nums << 5
+      @sut_dup.nums << 6
 
-    sut.strs << 'd'
-    sut_clone.strs << 'e'
-    sut_dup.strs << 'f'
+      expected = [1,2,3,4,5,6]
 
-    assert_equal(%w[a b c d],sut.strs)
-    assert_equal(%w[a b c e],sut_clone.strs)
-    assert_equal(%w[a b c f],sut_dup.strs)
+      _(@sut.nums).must_equal(expected)
+      _(@sut_clone.nums).must_equal(expected)
+      _(@sut_dup.nums).must_equal(expected)
+    end
   end
 
-  def assert_deep_copy(sut,sut_copy,copy_method_name)
-    refute_same(sut,sut_copy)
-
-    assert_nil(sut.init_copy_method_name)
-    assert_equal(copy_method_name,sut_copy.init_copy_method_name)
-
-    assert_nil(sut.orig)
-    assert_same(sut,sut_copy.orig)
-
-    expected = [1,2,3]
-
-    refute_same(sut.nums,sut_copy.nums)
-    assert_equal(expected,sut.nums)
-    assert_equal(expected,sut_copy.nums)
-
-    sut.nums << 4
-    sut_copy.nums << 5
-
-    assert_equal([1,2,3,4],sut.nums)
-    assert_equal([1,2,3,5],sut_copy.nums)
-
-    # Reset.
-    sut.nums.pop
-    sut_copy.nums.pop
-  end
-
-  def refute_deep_copy(sut,sut_copy,copy_method_name,is_safe_copy: false)
-    refute_same(sut,sut_copy)
-
-    assert_nil(sut.init_copy_method_name)
-    assert_equal(copy_method_name,sut_copy.init_copy_method_name)
-
-    assert_nil(sut.orig)
-
-    if is_safe_copy
-      assert_same(sut,sut_copy.orig)
-    else
-      assert_nil(sut_copy.orig)
+  describe 'with copy' do
+    before do
+      @sut = TestBagWithCopy.new
+      @sut_clone = @sut.clone
+      @sut_dup = @sut.dup
     end
 
-    expected = [1,2,3]
+    add_basic_copy_tests
+    add_deep_copy_tests
+  end
 
-    assert_same(sut.nums,sut_copy.nums)
-    assert_equal(expected,sut.nums)
-    assert_equal(expected,sut_copy.nums)
+  describe 'with copy and internal state' do
+    before do
+      @sut = TestBagWithCopy.new
 
-    sut.nums << 4
-    sut_copy.nums << 5
+      @sut.nums.extend(
+        Module.new do
+          def bonus
+            return 110
+          end
+        end
+      )
+      @sut.nums.freeze
 
-    expected = [1,2,3,4,5]
+      @sut_clone = @sut.clone
+      @sut_dup = @sut.dup
+    end
 
-    assert_equal(expected,sut.nums)
-    assert_equal(expected,sut_copy.nums)
+    add_basic_copy_tests
+    add_deep_copy_tests(is_frozen: true)
 
-    # Reset.
-    sut.nums.pop(2)
+    it 'has the correct bonus extension' do
+      _(@sut.nums).must_respond_to(:bonus,'SUT should have the nums bonus extension')
+      _(@sut.nums.bonus).must_equal(110)
+
+      _(@sut_clone.nums).must_respond_to(:bonus,'clone should keep the nums bonus extension')
+      _(@sut_clone.nums.bonus).must_equal(110)
+
+      _(@sut_dup.nums).wont_respond_to(:bonus,'dup should remove the nums bonus extension')
+      _ { @sut_dup.bonus }.must_raise(NoMethodError)
+    end
+
+    it 'has the correct frozen state' do
+      _(@sut.nums.frozen?).must_equal(true,'SUT should have the nums as frozen')
+      _(@sut_clone.nums.frozen?).must_equal(true,'clone should keep the nums as frozen')
+      _(@sut_dup.nums.frozen?).must_equal(false,'dup should remove the nums as frozen')
+    end
+  end
+
+  describe 'child with copy and unsafe var' do
+    before do
+      @sut = TestBagChildWithCopyAndUnsafe.new
+      @sut_clone = @sut.clone
+      @sut_dup = @sut.dup
+    end
+
+    add_basic_copy_tests
+    add_deep_copy_tests
+
+    it 'does a deep copy of the strs' do
+      _(@sut.strs).wont_be_same_as(@sut_clone.strs)
+      _(@sut.strs).wont_be_same_as(@sut_dup.strs)
+
+      expected = %w[a b c]
+
+      _(@sut.strs).must_equal(expected)
+      _(@sut_clone.strs).must_equal(expected)
+      _(@sut_dup.strs).must_equal(expected)
+
+      @sut.strs << 'd'
+      @sut_clone.strs << 'e'
+      @sut_dup.strs << 'f'
+
+      _(@sut.strs).must_equal(%w[a b c d])
+      _(@sut_clone.strs).must_equal(%w[a b c e])
+      _(@sut_dup.strs).must_equal(%w[a b c f])
+    end
+
+    it 'does not do a deep copy of the unsafe var' do
+      _(@sut.unsafe).wont_respond_to(:clone)
+      _(@sut.unsafe).wont_respond_to(:dup)
+
+      _(@sut.unsafe).must_be_same_as(@sut_clone.unsafe)
+      _(@sut.unsafe).must_be_same_as(@sut_dup.unsafe)
+    end
   end
 end
 
 class TestBag
-  include InitCopy
+  include InitCopy::Able
 
   attr_reader :orig
   attr_reader :nums
@@ -230,13 +214,24 @@ class TestBagWithCopy < TestBag
   end
 end
 
-class TestBagWithSafeCopy < TestBag
-  protected
+class TestBagChildWithCopyAndUnsafe < TestBagWithCopy
+  attr_reader :strs
+  attr_reader :unsafe
 
-  def init_copy(orig)
+  def initialize
     super
 
-    @orig = orig
-    @nums = ic_copy?(@nums)
+    @strs = %w[a b c]
+    @unsafe = Class.new do
+      undef_method :clone
+      undef_method :dup
+    end.new
+  end
+
+  def init_copy(*)
+    super
+
+    @strs = ic_copy(@strs)
+    @unsafe = ic_copy?(@unsafe)
   end
 end

@@ -3,7 +3,7 @@
 
 require 'bundler/gem_tasks'
 
-require 'init_copy'
+require 'init_copy/version'
 require 'rake/clean'
 require 'rake/testtask'
 require 'rdoc/task'

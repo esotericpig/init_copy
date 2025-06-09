@@ -8,11 +8,13 @@
 # SPDX-License-Identifier: MIT
 #++
 
+require 'init_copy/version'
+
 # Example usage:
 #   require 'init_copy'
 #
 #   class JangoFett
-#     include InitCopy
+#     include InitCopy::Able
 #
 #     protected
 #
@@ -24,33 +26,11 @@
 #     end
 #   end
 module InitCopy
-  VERSION = '0.2.0'
-
-  def self.included(mod)
-    super
-
-    # NOTE: Can't use prepend(), else children's init_copy() won't call their parents', even with super().
-    mod.include(Copyable)
-  end
-
-  def self.extended(mod)
-    super
-
-    mod.include(Copyable)
-  end
-
-  def self.prepended(mod)
-    super
-
-    # User specifically requested to prepend.
-    mod.prepend(Copyable)
-  end
-
-  module Copyable
+  module Able
     def initialize_clone(orig)
       super
 
-      # The instance variable name is long & obnoxious to reduce conflicts.
+      # The instance var name is long & obnoxious to reduce conflicts.
       @__init_copy_method_name = :clone
       init_copy(orig)
     end

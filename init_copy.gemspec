@@ -1,7 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative 'lib/init_copy'
+require_relative 'lib/init_copy/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'init_copy'
@@ -21,9 +21,8 @@ Gem::Specification.new do |spec|
     'changelog_uri'         => 'https://github.com/esotericpig/init_copy/blob/main/CHANGELOG.md',
   }
 
-  # Lowest version that isn't eol (end-of-life).
   # - https://www.ruby-lang.org/en/downloads/branches/
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 2.4'
   spec.require_paths         = ['lib']
   spec.bindir                = 'bin'
   spec.executables           = []

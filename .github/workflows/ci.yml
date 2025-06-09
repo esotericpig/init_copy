@@ -7,16 +7,13 @@ on:
   pull_request:
     branches: [ 'main' ]
 
-permissions:
-  contents: read
-
 jobs:
   test:
     strategy:
       matrix:
         os: [ 'ubuntu-latest','macos-latest' ]
         # - https://www.ruby-lang.org/en/downloads/branches
-        ruby-version: [ '3.2','ruby-head' ]
+        ruby-version: [ '2.4','3.2','ruby-head' ]
 
     runs-on: "${{ matrix.os }}"
 
