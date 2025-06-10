@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata = {
     'rubygems_mfa_required' => 'true',
-    'homepage_uri'          => 'https://github.com/esotericpig/init_copy',
+    'homepage_uri'          => spec.homepage,
     'source_code_uri'       => 'https://github.com/esotericpig/init_copy',
     'bug_tracker_uri'       => 'https://github.com/esotericpig/init_copy/issues',
     'changelog_uri'         => 'https://github.com/esotericpig/init_copy/blob/main/CHANGELOG.md',

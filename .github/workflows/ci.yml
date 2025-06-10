@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ 'main' ]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -37,7 +40,7 @@ jobs:
         bundle install
 
     - name: Run tests
-      run: bundle exec rake
+      run: bundle exec rake test
 
     - name: Test doc
       run: bundle exec rake doc

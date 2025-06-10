@@ -228,6 +228,8 @@ class TestBagChildWithCopyAndUnsafe < TestBagWithCopy
     end.new
   end
 
+  protected
+
   def init_copy(*)
     super
 
