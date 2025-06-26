@@ -8,7 +8,7 @@ require 'rake/clean'
 require 'rake/testtask'
 require 'rdoc/task'
 
-CLEAN.exclude('.git/','.github/','.idea/','stock/')
+CLEAN.exclude('{.git,.github,.idea,stock}/**/*')
 CLOBBER.include('doc/')
 
 task default: %i[test]
