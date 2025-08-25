@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     strategy:
@@ -39,13 +43,13 @@ jobs:
     - name: Install Gems
       run: |
         gem update bundler
-        bundle install
+        bundler install
 
     - name: Run tests
-      run: bundle exec rake test
+      run: bundler exec rake test
 
     - name: Test build & install
       run: |
-        bundle exec rake build
+        bundler exec rake build
         gem install --document --local pkg/*.gem
         ruby -w -r init_copy -e 'puts InitCopy::VERSION'

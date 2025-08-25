@@ -13,11 +13,11 @@ require 'minitest/autorun'
 require 'init_copy'
 
 describe InitCopy do
-  it 'has a correct version' do
+  it 'has the version' do
     _(InitCopy::VERSION).must_match(/\d+\.\d+\.\d+(-[0-9A-Za-z\-.]+)?(\+[0-9A-Za-z\-.]+)?/)
   end
 
-  def self.add_basic_copy_tests
+  def self.it_does_a_shallow_copy
     it 'is not the same as the copies' do
       _(@sut).wont_be_same_as(@sut_clone)
       _(@sut).wont_be_same_as(@sut_dup)
@@ -30,7 +30,7 @@ describe InitCopy do
     end
   end
 
-  def self.add_deep_copy_tests(is_frozen: false)
+  def self.it_does_a_deep_copy(is_frozen: false)
     it 'has the correct original' do
       _(@sut.orig).must_be_nil
       _(@sut_clone.orig).must_be_same_as(@sut)
@@ -66,7 +66,7 @@ describe InitCopy do
       @sut_dup = @sut.dup
     end
 
-    add_basic_copy_tests
+    it_does_a_shallow_copy
 
     it 'has no original' do
       _(@sut.orig).must_be_nil
@@ -103,8 +103,8 @@ describe InitCopy do
       @sut_dup = @sut.dup
     end
 
-    add_basic_copy_tests
-    add_deep_copy_tests
+    it_does_a_shallow_copy
+    it_does_a_deep_copy
   end
 
   describe 'with copy and internal state' do
@@ -124,8 +124,8 @@ describe InitCopy do
       @sut_dup = @sut.dup
     end
 
-    add_basic_copy_tests
-    add_deep_copy_tests(is_frozen: true)
+    it_does_a_shallow_copy
+    it_does_a_deep_copy(is_frozen: true)
 
     it 'has the correct bonus extension' do
       _(@sut.nums).must_respond_to(:bonus,'SUT should have the nums bonus extension')
@@ -152,8 +152,8 @@ describe InitCopy do
       @sut_dup = @sut.dup
     end
 
-    add_basic_copy_tests
-    add_deep_copy_tests
+    it_does_a_shallow_copy
+    it_does_a_deep_copy
 
     it 'does a deep copy of the strs' do
       _(@sut.strs).wont_be_same_as(@sut_clone.strs)
@@ -177,6 +177,8 @@ describe InitCopy do
     it 'does not do a deep copy of the unsafe var' do
       _(@sut.unsafe).wont_respond_to(:clone)
       _(@sut.unsafe).wont_respond_to(:dup)
+      expect { @sut.unsafe.clone }.must_raise(NoMethodError)
+      expect { @sut.unsafe.dup }.must_raise(NoMethodError)
 
       _(@sut.unsafe).must_be_same_as(@sut_clone.unsafe)
       _(@sut.unsafe).must_be_same_as(@sut_dup.unsafe)
